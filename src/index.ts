@@ -1,15 +1,15 @@
 // class imports
-import { DragAndDrop } from './classes/DragAndDrop';
-
-// helper function imports
-import { renderTemplate } from './utils/renderTemplate';
+import { ProjectInput } from './classes/ProjectInput';
 
 // instantiate classes
-const project = new DragAndDrop('My Project');
+const project = new ProjectInput();
+project.attachNodes();
+project.formControl();
 
 // ----------------------------------------------------- //
 
 // render template tags
-renderTemplate('project-input');
-renderTemplate('single-project');
-renderTemplate('project-list');
+// const app = document.getElementById('app') as HTMLDivElement;
+// renderTemplate('project-input', app);
+// renderTemplate('single-project', app);
+// renderTemplate('project-list', app);
