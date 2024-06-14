@@ -4,7 +4,7 @@ export const BindMethod = (
 	descriptor: PropertyDescriptor
 ) => {
 	const orgDescriptor = descriptor.value;
-	const adjustedDescriptor = {
+	const adjustedDescriptor: PropertyDescriptor = {
 		configurable: true,
 		enumerable: false,
 		get() {

@@ -1,14 +1,20 @@
-export const renderTemplate = (
+export const renderTemplate = <T, U extends { appendChild: Function }>(
 	hookId: string,
-	child: HTMLDivElement
-): HTMLTemplateElement => {
-	let importedNode;
+	root: U
+): T => {
+	let element;
 
-	importedNode = document.getElementById(hookId);
+	let currentEl = document.getElementById(hookId) as HTMLTemplateElement;
+	let importedNode = document.importNode(
+		currentEl.content,
+		true
+	) as DocumentFragment;
+
 	if (importedNode) {
-		let clone = (importedNode as HTMLTemplateElement).content.cloneNode(true);
-		child.appendChild(clone);
+		element = importedNode.firstElementChild as HTMLElement;
+		element.id = `${hookId}-id`;
+		root.appendChild(element);
 	}
 
-	return <HTMLTemplateElement>importedNode;
+	return element as T;
 };

@@ -1,15 +1,20 @@
 // class imports
 import { ProjectInput } from './classes/ProjectInput';
 
+class DragAndDrop {
+	projectInput: ProjectInput;
+
+	constructor() {
+		this.projectInput = new ProjectInput();
+	}
+
+	public run() {
+		console.log('Running...');
+	}
+}
+
 // instantiate classes
-const project = new ProjectInput();
-project.attachNodes();
-project.formControl();
+const dnd = new DragAndDrop();
+dnd.run();
 
-// ----------------------------------------------------- //
-
-// render template tags
-// const app = document.getElementById('app') as HTMLDivElement;
-// renderTemplate('project-input', app);
-// renderTemplate('single-project', app);
-// renderTemplate('project-list', app);
+//TODO: finish the isValid checking method
