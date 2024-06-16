@@ -116,19 +116,6 @@ export class ProjectInput {
 			const [title, desc, people] = userInput;
 			this.state.addProject(title, desc, people);
 
-			const newLIContent = `
-				<p>Overview: ${desc}</p>
-				<p>Number of people involved: ${people}</p>
-			`;
-			// let singleProject = this.render.getTemplateElWithId('single-project')!;
-			// 	(singleProject as HTMLLIElement).innerHTML = ;
-			// 	let projectListSet = this.render.getTemplateElWithId('project-list')!;
-			// 	let titleEl = projectListSet.querySelector('h2')!;
-			// 	let listEl = projectListSet.querySelector('ul')!;
-			// 	(titleEl as HTMLHeadingElement).textContent = title;
-			// 	(listEl as HTMLUListElement).append(singleProject);
-			// 	this.root.appendChild(projectListSet);
-
 			this.clearInputs();
 		}
 	}

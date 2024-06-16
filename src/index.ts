@@ -24,5 +24,3 @@ class DragAndDrop {
 // instantiate classes
 const dnd = new DragAndDrop();
 dnd.run();
-
-//TODO: finish the isValid checking method
