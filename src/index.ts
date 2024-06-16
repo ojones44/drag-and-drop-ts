@@ -1,11 +1,19 @@
 // class imports
 import { ProjectInput } from './classes/ProjectInput';
+import { ProjectList } from './classes/ProjectList';
+import { StateManager } from './classes/StateManager';
 
 class DragAndDrop {
 	projectInput: ProjectInput;
+	projectList: ProjectList;
+	state: StateManager;
 
 	constructor() {
-		this.projectInput = new ProjectInput();
+		// initialize state manager
+		this.state = StateManager.getInstance();
+		this.projectInput = new ProjectInput(this.state);
+		this.projectList = new ProjectList(this.state, 'active');
+		this.projectList = new ProjectList(this.state, 'finished');
 	}
 
 	public run() {

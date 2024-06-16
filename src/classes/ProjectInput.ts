@@ -1,25 +1,29 @@
+// class imports
+import { Render } from './Render';
+import { StateManager } from './StateManager';
+
+// decorator imports
 import { BindMethod } from '../decorators/BindMethod';
-import { renderTemplate } from '../utils/renderTemplate';
 
 // type imports
 import { Validate } from '../types/Validate';
 
 export class ProjectInput {
-	renderTemplate: <T, U extends { appendChild: Function }>(
-		hookId: string,
-		child: U
-	) => T;
+	render: Render;
 	root: HTMLDivElement;
 	form: HTMLFormElement;
 	titleInputEl: HTMLInputElement;
 	descInputEl: HTMLInputElement;
 	peopleInputEl: HTMLInputElement;
 
-	constructor() {
-		// get rood element and attach nodes
+	constructor(private state: StateManager) {
+		// instantiate dependent classes
+		this.render = new Render();
+
+		// get root element and attach nodes
 		this.root = document.getElementById('app')! as HTMLDivElement;
-		this.renderTemplate = renderTemplate;
-		this.form = this.attachNode('project-input');
+		this.form = this.render.attachNode('project-input');
+		this.attach();
 
 		// inputs (root should now be set)
 		this.titleInputEl = this.root.querySelector('#title') as HTMLInputElement;
@@ -30,19 +34,36 @@ export class ProjectInput {
 		this.configure();
 	}
 
+	testing() {
+		this.state.addProject('from project input class', 'something', 2);
+	}
+
+	private attach() {
+		this.root.appendChild(this.form);
+	}
+
+	private configure() {
+		this.form.addEventListener('submit', this.submitHandler);
+	}
+
 	private validateLength(...data: string[]): boolean {
 		return data.every((input) => input.trim().length !== 0);
 	}
 
 	private isValid(input: Validate): boolean {
+		if (input.value === null || undefined) return false;
 		let valid = true;
-		const inputLength = input.value.trim().length;
+		const inputLength = input.value.toString().trim().length;
 
 		if (input.required) valid = valid && inputLength !== 0;
-		if (input.minLength) valid = valid && inputLength >= input.minLength;
-		if (input.maxLength) valid = valid && inputLength <= input.maxLength;
-		if (input.min) valid = valid && +input.value >= input.min;
-		if (input.max) valid = valid && +input.value <= input.max;
+
+		if (typeof input.value === 'string') {
+			if (input.minLength) valid = valid && inputLength >= input.minLength;
+			if (input.maxLength) valid = valid && inputLength <= input.maxLength;
+		} else if (typeof input.value === 'number') {
+			if (input.min) valid = valid && +input.value >= input.min;
+			if (input.max) valid = valid && +input.value <= input.max;
+		}
 
 		return valid;
 	}
@@ -62,6 +83,7 @@ export class ProjectInput {
 			value: enteredTitle,
 			required: true,
 			minLength: 2,
+			maxLength: 50,
 		};
 
 		const descValidation: Validate = { value: enteredDesc, required: false };
@@ -69,7 +91,8 @@ export class ProjectInput {
 		const peopleValidation: Validate = {
 			value: enteredPeople,
 			required: true,
-			min: 3,
+			min: 1,
+			max: 10,
 		};
 
 		if (
@@ -91,19 +114,22 @@ export class ProjectInput {
 
 		if (Array.isArray(userInput)) {
 			const [title, desc, people] = userInput;
-			console.log(title, desc, people);
+			this.state.addProject(title, desc, people);
+
+			const newLIContent = `
+				<p>Overview: ${desc}</p>
+				<p>Number of people involved: ${people}</p>
+			`;
+			// let singleProject = this.render.getTemplateElWithId('single-project')!;
+			// 	(singleProject as HTMLLIElement).innerHTML = ;
+			// 	let projectListSet = this.render.getTemplateElWithId('project-list')!;
+			// 	let titleEl = projectListSet.querySelector('h2')!;
+			// 	let listEl = projectListSet.querySelector('ul')!;
+			// 	(titleEl as HTMLHeadingElement).textContent = title;
+			// 	(listEl as HTMLUListElement).append(singleProject);
+			// 	this.root.appendChild(projectListSet);
+
 			this.clearInputs();
 		}
-	}
-
-	private configure() {
-		this.form.addEventListener('submit', this.submitHandler);
-	}
-
-	private attachNode(template: string) {
-		return this.renderTemplate<HTMLFormElement, HTMLDivElement>(
-			template,
-			this.root
-		);
 	}
 }
