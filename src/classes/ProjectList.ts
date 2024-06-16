@@ -42,7 +42,11 @@ export class ProjectList extends Component<HTMLDivElement, HTMLFormElement> {
 		const listEl = document.getElementById(id)! as HTMLUListElement;
 		listEl.innerHTML = '';
 		for (const prjItem of this.assignedProjects) {
-			new ProjectItem(id, 'single-project', prjItem);
+			new ProjectItem(
+				this.element.querySelector('ul')!.id,
+				'single-project',
+				prjItem
+			);
 		}
 	}
 
