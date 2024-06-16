@@ -1,6 +1,6 @@
 // class imports
-import { Render } from './Render';
-import { StateManager } from './StateManager';
+import { Component } from './Component';
+import { ProjectState } from './StateManager';
 
 // decorator imports
 import { BindMethod } from '../decorators/BindMethod';
@@ -8,24 +8,14 @@ import { BindMethod } from '../decorators/BindMethod';
 // type imports
 import { Validate } from '../types/Validate';
 
-export class ProjectInput {
-	render: Render;
-	root: HTMLDivElement;
-	form: HTMLFormElement;
+export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 	titleInputEl: HTMLInputElement;
 	descInputEl: HTMLInputElement;
 	peopleInputEl: HTMLInputElement;
 
-	constructor(private state: StateManager) {
-		// instantiate dependent classes
-		this.render = new Render();
-
-		// get root element and attach nodes
-		this.root = document.getElementById('app')! as HTMLDivElement;
-		this.form = this.render.attachNode('project-input');
-		this.attach();
-
-		// inputs (root should now be set)
+	constructor(private state: ProjectState) {
+		super('app', 'project-input');
+		// inputs (root should be set in Component)
 		this.titleInputEl = this.root.querySelector('#title') as HTMLInputElement;
 		this.descInputEl = this.root.querySelector('#desc') as HTMLInputElement;
 		this.peopleInputEl = this.root.querySelector('#people') as HTMLInputElement;
@@ -38,13 +28,11 @@ export class ProjectInput {
 		this.state.addProject('from project input class', 'something', 2);
 	}
 
-	private attach() {
-		this.root.appendChild(this.form);
+	configure() {
+		this.element.addEventListener('submit', this.submitHandler);
 	}
 
-	private configure() {
-		this.form.addEventListener('submit', this.submitHandler);
-	}
+	renderContent() {}
 
 	private validateLength(...data: string[]): boolean {
 		return data.every((input) => input.trim().length !== 0);

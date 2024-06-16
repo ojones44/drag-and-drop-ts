@@ -1,52 +1,48 @@
 // class imports
-import { Render } from './Render';
-import { StateManager } from './StateManager';
+import { Component } from './Component';
+import { ProjectState } from './StateManager';
 import { Project } from './Project';
+import { ProjectStatus } from '../types/ProjectStatus';
+import { ProjectItem } from './ProjectItem';
 
-export class ProjectList {
-	render: Render;
-	root: HTMLDivElement;
-	element: HTMLTemplateElement;
+export class ProjectList extends Component<HTMLDivElement, HTMLFormElement> {
 	assignedProjects: Project[];
 
 	constructor(
-		private state: StateManager,
+		private state: ProjectState,
 		private type: 'active' | 'finished'
 	) {
-		this.render = new Render();
-		this.root = document.getElementById('app')! as HTMLDivElement;
-		this.element = this.render.attachNode<HTMLTemplateElement>(
-			'project-list',
-			type
-		);
+		super('app', 'project-list', type);
 		this.assignedProjects = [];
 
-		this.state.addListener((projects: Project[]) => {
-			this.assignedProjects = projects;
-			this.renderProjects();
-		});
-
-		this.attach();
+		this.configure();
 		this.injectProjectLists();
 	}
 
-	private attach() {
-		this.root.appendChild(this.element);
+	testing() {
+		this.state.addProject('from project list class', 'something', 2);
 	}
 
-	private renderProjects() {
-		const listEl = document.getElementById(
-			`${this.type}-projects-list`
-		)! as HTMLUListElement;
+	configure() {
+		this.state.addListener((projects: Project[]) => {
+			const relevantProjects = projects.filter((project) => {
+				if (this.type === 'active') {
+					return project.status === ProjectStatus.Active;
+				} else {
+					return project.status === ProjectStatus.Finished;
+				}
+			});
+			this.assignedProjects = relevantProjects;
+			this.renderContent();
+		});
+	}
+
+	renderContent() {
+		const id = `${this.type}-projects-list`;
+		const listEl = document.getElementById(id)! as HTMLUListElement;
 		listEl.innerHTML = '';
 		for (const prjItem of this.assignedProjects) {
-			const listItem = document.createElement('li') as HTMLLIElement;
-			listItem.innerHTML = `
-        <h3>${prjItem.title}</h3>
-				<p>Overview: ${prjItem.desc ? prjItem.desc : 'no description available'}</p>
-				<p>Number of people involved: ${prjItem.people}</p>
-			`;
-			listEl.appendChild(listItem);
+			new ProjectItem(id, 'single-project', prjItem);
 		}
 	}
 
@@ -56,9 +52,5 @@ export class ProjectList {
 		this.element.querySelector(
 			'h2'
 		)!.textContent = `${this.type.toUpperCase()} PROJECTS`;
-	}
-
-	testing() {
-		this.state.addProject('from project list class', 'something', 2);
 	}
 }

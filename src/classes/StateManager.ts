@@ -5,24 +5,29 @@ import { Listener } from '../types/Listener';
 // class imports
 import { Project } from './Project';
 
-export class StateManager {
-	private static instance: StateManager;
-	private projects: Project[] = [];
-	private listeners: Listener[] = [];
+export class StateManager<T> {
+	protected listeners: Listener<T>[] = [];
 
-	private constructor() {}
+	addListener(listener: Listener<T>) {
+		this.listeners.push(listener);
+	}
+}
+
+export class ProjectState extends StateManager<Project> {
+	private projects: Project[] = [];
+	private static instance: ProjectState;
+
+	private constructor() {
+		super();
+	}
 
 	static getInstance() {
-		if (StateManager.instance) {
+		if (ProjectState.instance) {
 			return this.instance;
 		}
 
-		this.instance = new StateManager();
+		this.instance = new ProjectState();
 		return this.instance;
-	}
-
-	addListener(listener: Listener) {
-		this.listeners.push(listener);
 	}
 
 	addProject(title: string, desc: string, people: number) {
