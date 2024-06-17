@@ -40,8 +40,19 @@ export class ProjectState extends StateManager<Project> {
 		);
 
 		this.projects.push(newProject);
-		console.log(this.projects);
+		this.updateListeners();
+	}
 
+	updateStatus(id: string, newStatus: ProjectStatus): void {
+		const project = this.projects.find((p) => p.id === id)!;
+
+		if (project && project.status !== newStatus) {
+			project.status = newStatus;
+			this.updateListeners();
+		}
+	}
+
+	private updateListeners() {
 		for (const listenerFn of this.listeners) {
 			listenerFn(this.projects.slice());
 		}

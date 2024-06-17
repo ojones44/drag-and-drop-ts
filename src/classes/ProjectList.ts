@@ -5,7 +5,16 @@ import { Project } from './Project';
 import { ProjectStatus } from '../types/ProjectStatus';
 import { ProjectItem } from './ProjectItem';
 
-export class ProjectList extends Component<HTMLDivElement, HTMLFormElement> {
+// type imports
+import { DragTarget } from '../types/DragAndDrop';
+
+// decorator imports
+import { BindMethod } from '../decorators/BindMethod';
+
+export class ProjectList
+	extends Component<HTMLDivElement, HTMLFormElement>
+	implements DragTarget
+{
 	assignedProjects: Project[];
 
 	constructor(
@@ -35,6 +44,35 @@ export class ProjectList extends Component<HTMLDivElement, HTMLFormElement> {
 			this.assignedProjects = relevantProjects;
 			this.renderContent();
 		});
+
+		this.element.addEventListener('dragover', this.dragOverHandler);
+		this.element.addEventListener('dragleave', this.dragLeaveHandler);
+		this.element.addEventListener('drop', this.dropHandler);
+	}
+
+	@BindMethod
+	dragOverHandler(e: DragEvent): void {
+		if (e.dataTransfer && e.dataTransfer.types[0] === 'text/plain') {
+			e.preventDefault();
+			const listEl = this.element.querySelector('ul')! as HTMLUListElement;
+			listEl.classList.add('droppable');
+		}
+	}
+
+	@BindMethod
+	dragLeaveHandler(_: DragEvent): void {
+		const listEl = this.element.querySelector('ul')! as HTMLUListElement;
+		listEl.classList.remove('droppable');
+	}
+
+	@BindMethod
+	dropHandler(e: DragEvent): void {
+		const prjID = e.dataTransfer!.getData('text/plain');
+		const newStatus =
+			this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished;
+		this.state.updateStatus(prjID, newStatus);
+		const listEl = this.element.querySelector('ul')! as HTMLUListElement;
+		listEl.classList.remove('droppable');
 	}
 
 	renderContent() {
